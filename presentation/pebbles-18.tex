@@ -1,0 +1,1607 @@
+%---------------------------------------------------------------------------
+%
+% Time-stamp: <2018-05-04 18:39:49 sutner> 
+%
+% :File:      pebbles-16.tex
+% :Purpose:   based on Andrew's Leap talk
+%
+%  80 minutes with lots of interaction
+%
+%---------------------------------------------------------------------------
+\documentclass[handout,10pt]{ksbeamer}
+
+% deal with extra registers in proof.sty
+\usepackage{etex}
+\reserveinserts{30}
+\usepackage{stmaryrd}
+\usepackage[english]{babel}
+\usepackage{url}
+\usepackage{mathtools}
+\usepackage{bm}
+% \usepackage{enumitem}
+
+%---------------------------------------------------------------------------
+
+\useinnertheme{KSlec}
+\usetheme{KSlec}
+
+\beamertemplatenumberedballsectiontoc
+
+\graphicspath{%
+{/home/sutner/Research/Transducers/Pics/}%
+{/home/sutner/projects/Discrete/pics/people/}%
+{/home/sutner/projects/Discrete/pics/disc/}%
+{/home/sutner/projects/Discrete/pics/new10/}%
+{/home/sutner/projects/Discrete/pics/graphs/}%
+{/home/sutner/projects/Discrete/standalone/}%
+{./}}
+
+\let\emph=\alert
+
+%---------------------------------------------------------------------------
+% macros
+
+\newenvironment{klein}{\bigl(\begin{smallmatrix}}{\end{smallmatrix}\bigl)}
+
+\def\resid#1#2{\partial_{#1}{#2}}
+\def\twost{\Star{\2}}
+\def\shuffle{\mathrel{\|}}
+\def\nstep{\shortrightarrow}
+\def\cG{{\cal G}}
+\def\fA{\mathfrak{A}}
+\def\smc#1#2{{#1}{:}{#2}}
+\def\zwei#1#2{{#2}}
+\def\postomega#1{{#1}^\omega}
+\def\tott{\stackrel {*}\shortrightarrow}
+
+
+\def\pcd{\phantom{\cdot}}       % for psmatrix dummy entry
+\def\shuffle{\mathrel{\|}}
+\def\proone{\mathsf{even}}
+\def\protwo{\mathsf{odd}}
+\def\dep{\mathrm{dep}}
+\def\pari{\mathop{\mathrm{par}}}
+\def\cT{\mathcal{T}}
+\def\cQ{\mathcal{Q}}
+\def\frM{\mathfrak{M}}
+\def\frMb{\mathfrak{M}_{\mathrm{b}}}
+\def\frMs{\mathfrak{M}_{\mathrm{s}}}
+\def\frC{\mathfrak{C}}
+\def\Zeta{\mathsf{Z}}
+\def\cycll{\mathrm{cl}}
+\def\Root{\mathsf{root}}
+\def\orb{\mathsf{orb}}
+\def\Aut{\mathsf{Aut}}
+\def\SymG{\mathfrak{S}}
+\def\relapp#1#2{{#1} \, {#2}}
+\def\Relapp#1#2{\orb( {#1} ; {#2} )}
+\def\twos{\Star{\2}}
+\def\TS{\Star{T}}
+\def\SS{\Star{\2}}
+\def\orbeq{\equiv}
+\let\ol=\overline
+\let\ul=\underline
+\let\ov=\underline
+\def\opp{{\mathsf{op}}}
+\def\frst{{\mathsf{fst}}}
+
+\renewcommand{\vec}[1]{\bm{{#1}}}
+\def\trnp#1#2{{#1}{/}{#2}}
+\def\recp#1#2{{#1}{:}{#2}}
+\def\cyclet#1{\mathcal{C}_{#1}}
+\def\trans#1#2#3{{#1}\stackrel{{#2}}{\longrightarrow}{#3}}
+\def\Rel#1#2#3{\mathbf{#1}({#2},{#3})}
+
+\def\LQ#1#2{{#1}{\downarrow}{#2}}
+
+\def\CCC#1#2{\mathcal{A}^{#1}_{#2}}
+\def\TTT#1#2{\mathfrak{T}^{#1}_{#2}}
+\def\CCCE#1#2{\mathcal{K}^{#1}_{#2}}
+\def\F#1{\underline{#1}}
+\def\pre#1{{#1}^{-}}
+\def\post#1{{#1}^{+}}
+
+\def\Morb{\mathcal{M}}
+
+\def\div{\mathrel{\mathrm{div}}}
+
+\Mathsf{A}
+\Mathsf{B}
+
+%---------------------------------------------------------------------------
+
+\title{Flipping Pebbles}
+
+\author[K. Sutner]{Klaus Sutner}
+\institute{Carnegie Mellon University}
+\date{}
+
+
+%---------------------------------------------------------------------------
+\begin{document}
+
+
+\frame{\titlepage}
+
+
+%---------------------------------------------------------------------------
+\section{A Pebble Game}
+\frame{\tableofcontents[current]}
+%---------------------------------------------------------------------------
+
+
+%---------------------------------------------------------------------------
+\begin{frame} 
+\frametitle{Flipping  Pebbles}
+  
+
+\begin{center}
+  \includegraphics[scale=0.1]{trans-01}
+\end{center}
+
+\begin{center}
+  {\LARGE\textbf{$\Downarrow$}}
+\end{center}
+
+\begin{center}
+  \includegraphics[scale=0.1]{trans-02}
+\end{center}
+\vspace{4ex} 
+
+\begin{graywidthbox}{0.9}
+Given a row of tokens, white on one side, blue on the other. 
+Flip the first token.  If it was white,
+  skip the next two tokens; otherwise, skip just one token. 
+Keep flipping till you fall off the end.
+\end{graywidthbox}
+
+\end{frame}
+
+
+%---------------------------------------------------------------------------
+\begin{frame} 
+\frametitle{}
+  
+\begin{center}
+  \includegraphics[scale=0.026]{trans-1}
+\end{center}
+
+
+\end{frame}
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Getting Serious}
+
+\begin{center}
+\includegraphics[scale=2.0]{invtrans-09-sta}
+\end{center}
+
+Our pebble-flipping operation is really a word map defined by a 3-state 
+automaton  $\cA$.
+
+
+\end{frame}
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{The Word Maps}
+
+We can choose an initial state arbitrarily and write  $\F{0}$, $\F{1}$ and $\F{2}$ for 
+the corresponding maps $\SS \to \SS$. 
+The pebble flipping operation corresponds to $\F{0}$
+(map $\F{i}$ copies $i$ bits, then runs $\F{0}$).
+\vspace{3ex}
+
+We can write the maps in terms of simultaneous recursion on words, 
+$a \in \2$, $x \in \twost$: 
+\begin{align*}
+    \F{0}(0x) &=  1 \, \F{2}(x) \\[1ex]
+    \F{0}(1x) &=  0 \, \F{1}(x) \\[1ex]
+    \F{1}(ax) &=  a \, \F{0}(x) \\[1ex]
+    \F{2}(ax) &=  a \, \F{1}(x) 
+\end{align*}
+
+\end{frame}
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Invertible Mealy Machines}
+
+There are only two types of states:  \emph{copy} and \emph{toggle}.
+
+\begin{center}
+\includegraphics[scale=1.2]{invtrans-06-sta}
+\end{center}
+\vspace{3ex}
+
+As a consequence, there is no loss of information when applying the maps $\F{k}$,
+they are all length-preserving bijections on $\SS$. 
+\vspace{1ex} 
+
+
+\end{frame}
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Recall: DFAs}
+
+These machines are very similar to DFAs, but slightly different.
+\vspace{3ex}
+
+\begin{itemize}
+\addtolength{\itemsep}{2mm}
+\item  There is no initial state (computation can start at any state). 
+\item  There are no final states (computation just goes on and on). 
+\item The edge labels are not in $\2$ but in $\2 \times \2$ (it's a transducer, not
+  an acceptor).
+\end{itemize}
+
+\end{frame}
+
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Sequential Maps}
+
+Our maps are special in the sense that there is no look-ahead:
+
+%
+$$
+    f(uv) = f(u) \, g(v)
+$$
+%
+
+where $f, g \in \setof{\F{0},\F{1},\F{2}}$. 
+\vspace{5ex}
+
+\textbf{Key Idea:}  \\[1ex]
+Think of such maps as \emph{automorphisms} of the infinite binary tree. 
+
+\end{frame}
+
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Tree Automorphisms}
+
+\hspace*{-10mm} 
+\includegraphics[scale=1.0]{binary-tree-8}
+\vspace{5ex} 
+
+We are interested in any permutation that preserves the tree structure
+(root to root, children to children).
+
+\end{frame}
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{As Word-Maps}
+
+\begin{center}
+\includegraphics[scale=1.2]{bin-tree-autos}
+\end{center}
+\vspace{3ex} 
+
+
+Suppose we want to interchange the two orange nodes 
+and their subtrees (everything else stays).
+Sequential map
+% 
+\begin{align*}
+f(0\,x)  &= 0\,x \\
+f(1\,a\,x) &= 1 \,\overline{a} \, x
+\end{align*}
+\end{frame}
+
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Getting Really Serious}
+
+The collection of all automorphisms of $\SS$ forms a huge uncountable group 
+\vspace{1ex} 
+
+\begin{mathyellowbox}
+       \Aut(\SS)
+\end{mathyellowbox}
+\vspace{5ex} 
+
+Group theorists are very interested in particular subgroups 
+$G \subseteq \Aut(\SS)$. 
+\vspace{5ex} 
+
+This is idea is about 40 years old. 
+
+\end{frame}
+
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Jean-Pierre Serre}
+
+
+\begin{columns}
+\begin{column}{0.6\textwidth}
+
+\includegraphics[scale=0.5]{Serre}
+\end{column}
+
+\begin{column}{0.4\textwidth}
+
+Fields Medal, Abel Prize, Steele Prize, Wolf Prize
+\vspace{3ex} 
+
+Member Bourbaki
+\vspace{3ex} 
+
+\tgrn{Arbres, Amalgames, $\mathit{SL}_{2}$} (1977)
+
+\end{column}
+\end{columns}
+
+\end{frame}
+
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{A New Idea: Automata}
+
+In general, the subgroups $G \subseteq \Aut(\SS)$ are hopelessly complicated.
+\vspace{5ex} 
+
+But how about the subgroups that can be defined in terms of a finite state machine?
+\vspace{5ex} 
+
+We take the group generated by the all the maps $\F{p}$ where $p$ ranges over the 
+state set:
+\vspace{1ex}
+
+\begin{mathyellowbox}
+  G = \setof{ \F{0}, \F{1}, \F{2}, \F{0}^{-1}, \F{0}^2, \F{0}\,\F{1}, \F{0}^{-1} \F{2}, \ldots}
+\end{mathyellowbox}
+
+
+\end{frame}
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Milnor's Question}
+
+Suppose your group has generators $\Sigma = \setof{g_{1},\ldots,g_{k}}$.
+\vspace{2ex}
+
+Words over $\Sigma$ correspond to group elements.
+\vspace{2ex}
+
+Get a \emph{growth function}
+%
+$$
+      \gamma(n) = \# \text{ group elm. obtained from } \Sigma^{n}
+$$
+%
+\vspace{2ex}
+
+It is easy to find examples where $\gamma$ is
+\begin{itemize}
+\item   polynomial
+\item   exponential 
+\end{itemize}
+
+Is there anything in between?
+
+\end{frame}
+
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Grigorchuk Group}
+
+\begin{center}
+\includegraphics[scale=1.2]{invtrans-07-sta}
+\end{center}
+
+\end{frame}
+
+
+% %---------------------------------------------------------------------------
+% \begin{frame}
+% \frametitle{Iteration}
+
+% Suppose we have word $u$ of length $k$ and a time $t$, $0 \leq t < 2^{k}$. 
+% \vspace{5ex} 
+
+
+% \begin{graybox}
+% How hard is to compute $\F{0}^{t}(x)$? 
+% \end{graybox}
+% \vspace{5ex} 
+
+% Of course, brute force is $\O(k\,2^k)$, we want a computational shortcut. 
+
+% \end{frame}
+
+
+
+%---------------------------------------------------------------------------
+\section{The ToC Angle}
+\frame{\tableofcontents[current]}
+%---------------------------------------------------------------------------
+
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Orbits}
+
+\begin{center}
+\includegraphics[scale=0.4]{A-3-2-orbit}
+\end{center}
+
+Applying a map  $\F{p}$ over and over to a given word, we get a cycle, 
+the \emph{orbit} of the word. 
+
+\end{frame}
+
+
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Length 5,  $\F{0}$ }
+
+\begin{center}
+\includegraphics[scale=0.9]{A-3-2-orbits-5}
+\end{center}
+
+
+\end{frame}
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Length 5,   $\F{0}$, $\F{1}$ }
+
+\begin{center}
+\includegraphics[scale=0.9]{A-3-2-level-5}
+\end{center}
+
+
+\end{frame}
+
+
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Obvious Questions}
+
+\begin{itemize}
+\addtolength{\itemsep}{3mm}
+\item  How long are these orbits? 
+\item  How many orbits are there of a given length? 
+\end{itemize}
+\vspace{5ex} 
+
+
+Of course, we want the answer for all of $\2^{k}$ in terms of $k$. 
+\vspace{3ex} 
+
+For our pebble game, the answer is pretty nice. 
+
+\end{frame}
+
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Computational Attack}
+
+$$
+\begin{array}{r||cccccccc}
+   &  1  &  2  &  4  &  8  &  16 &  32 &          \\
+\hline
+0  &  1  &     &     &     &     &     &    &   \\
+1  &     &  1  &     &     &     &     &    &   \\
+2  &     &  2  &     &     &     &     &    &   \\
+3  &     &     &  2  &     &     &     &    &   \\
+4  &     &     &  4  &     &     &     &    &   \\
+5  &     &     &     &  4  &     &     &    &   \\
+6  &     &     &     &  8  &     &     &    &   \\
+7  &     &     &     &     &  8  &     &    &   \\
+8  &     &     &     &     &  16 &     &    &   \\
+9  &     &     &     &     &     &  16 &    &   \\
+10 &     &     &     &     &     &  32 &    &   
+\end{array}
+$$
+\vspace{2ex} 
+
+$\to$: orbit length, $\downarrow$: word length, missing entries are 0
+
+\end{frame}
+
+% %---------------------------------------------------------------------------
+% \begin{frame} 
+% \frametitle{Splitting/Doubling Orbits}
+  
+% Consider a orbit 
+% \vspace{1ex} 
+
+% \begin{mathyellowbox} 
+% C = u_{0}, u_{1}, \ldots, u_{n-1}
+% \end{mathyellowbox}
+% \vspace{5ex} 
+
+% Then either there are two orbits 
+% \vspace{2ex} 
+
+% \begin{mathyellowbox} 
+% u_{0}\tgrn{0}, u_{1}\tgrn{b_{1}}, \ldots, u_{n-1}\tgrn{b_{n-1}};\quad   
+%  u_{0}\tgrn{1}, u_{1}\tgrn{\ov{b_{1}}}, \ldots, u_{n-1}\tgrn{\ov{b_{n-1}}} 
+% \end{mathyellowbox}
+% \vspace{2ex} 
+
+% or there is a single orbit 
+% \vspace{2ex} 
+
+% \begin{mathyellowbox} 
+% u_{0}\tgrn{0}, u_{1}\tgrn{b_{1}}, \ldots, u_{n-1}\tgrn{b_{n-1}},  
+%  u_{0}\tgrn{1}, u_{1}\tgrn{\ov{b_{1}}}, \ldots, u_{n-1}\tgrn{\ov{b_{n-1}}}. 
+% \end{mathyellowbox}
+
+% \end{frame}
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Counting Orbits}
+
+\begin{conjecture}
+For words of length $k$, there are $2^{\floor{k/2}}$ orbits. \\[1ex]
+The length of each orbit is $2^{\ceiling{k/2}}$.
+\end{conjecture}
+\vspace{8ex} 
+
+Of course, an actual proof requires some kind of idea as to why 
+this should be true.  
+\vspace{5ex} 
+
+\begin{exercise}
+Show that every orbit must have length $2^{\ell}$ for some $\ell$. 
+\end{exercise}
+
+\end{frame}
+
+
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Orbit  Problem}
+
+Suppose we have two words $x$ and $y$ of length $k$.
+\vspace{2ex} 
+
+\begin{graybox}
+How hard is it to test if $x$ and $y$ lie on the same orbit? 
+\end{graybox}
+\vspace{8ex} 
+
+
+Suppose  $x$ and $y$ lie on the same orbit. 
+\vspace{2ex} 
+
+
+\begin{graywidthbox}{0.9}
+How hard is to compute a timestamp $t$ such that 
+$\F{0}^{t}(x) = y$? 
+\end{graywidthbox}
+\vspace{5ex} 
+
+\end{frame}
+
+
+%---------------------------------------------------------------------------
+\begin{frame} 
+\frametitle{Digression: An Easy Case}
+
+\begin{center}
+\includegraphics[scale=1.1]{invtrans-16-sta}
+\end{center}
+\vspace{3ex} 
+
+For this automaton, one can give a simple description of all the maps $\F{p}$.
+\vspace{2ex}
+
+As a consequence, the orbit problem is almost trivial. 
+
+\end{frame}
+
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Non-Piazza Poll}
+
+Suppose you have $x, y \in \2^{1,000,000}$. 
+
+How long does it take to check whether $y$ is in the orbit of $x$ 
+under our pebble flipping map  $\F{0}$? 
+\vspace{2ex} 
+
+\begin{itemize}
+\item  one second
+\item  one minute
+\item  one hour
+\item  one year
+\item  longer than the lifespan of the universe
+\item  requires a quantum computer with 1,000,000 qbits
+\item  it's clearly undecidable
+\end{itemize}
+
+\end{frame}
+
+
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Some Surprising Facts}
+
+To simplify matters slightly, let us ignore the inverse maps
+$\F{p}^{-1}$ for the time being. 
+\vspace{3ex} 
+
+Techically, let $\cS$ be the semigroup generated by our three basic maps $\F{0}$, 
+$\F{1}$ and $\F{2}$. 
+Thus $\cS$ consists of all compositions that generically look like
+%
+$$
+    f = \F{0} \: \F{0} \: \F{2} \: \F{1} \: \F{0} \: \F{1} \: \F{1} \: \F{2} 
+$$
+%
+\vspace{5ex} 
+
+A priori, it is completely unclear what maps like $f$ look
+like, or how they interact. 
+
+\end{frame}
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Recall: Product Automata}
+
+We saw a theorem in class that says that whenever $f$ and $g$ are rational,
+so is their composition $f \circ g$.
+\vspace{5ex}
+
+Moreover, a transducer for $f \circ g$ can be constructed from the machines
+for $f$ and $g$  (product construction). 
+
+\end{frame}
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{$f = \F{0}^{8}$}
+
+Here is the product automaton for $f = \F{0}^{8}$:
+\vspace{3ex} 
+
+\begin{center}
+\includegraphics{CCC-3-2-0-8}
+\end{center}
+\vspace{3ex} 
+
+gray:  $a/a$, green  $0/1$, blue $1/0$
+
+
+\end{frame}
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{$f = \F{0}^{2}\F{1}\:\F{2}^{2}$}
+
+\begin{center}
+\includegraphics{A-3-2-principal}
+\end{center}
+
+\end{frame}
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Computability}
+
+So $\cS$ is a \emph{computable structure}:  there are finite data structures
+to represent the elements of $\cS$, and we can manipulated them algorithmically
+to deal with composition.
+\vspace{5ex}
+
+
+\begin{columns}
+\begin{column}{0.2\textwidth}
+
+  $\F{0}$, $\F{1}$, $\F{2}$
+  \vspace{10ex}
+
+  $f \circ g$
+  
+\end{column}
+
+\begin{column}{0.7\textwidth}
+
+  \includegraphics[scale=0.4]{A-3-2-generators}
+  \vspace{1ex}
+
+\qquad\qquad\qquad  $\cA \otimes \cB$
+
+\end{column}
+\end{columns}
+\vspace{5ex}
+
+That's nice, but we want to understand its structure.
+Just because we have an algorithm does not mean we understand
+what is going on. 
+
+\end{frame}
+
+
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Richard Hamming}
+
+%---------------------------------------------------------------------------
+\begin{center}
+   \includegraphics[scale=0.3]{Hamming}
+\end{center}
+%---------------------------------------------------------------------------
+
+\begin{quotation}
+  The purpose of computation is insight, not numbers. 
+\end{quotation}
+
+\end{frame}
+
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Commutativity}
+
+\begin{lemma}
+$\cS$ is commutative. 
+\end{lemma}
+\vspace{5ex} 
+
+There are two proofs for this:
+\vspace{1ex}
+
+\begin{itemize}
+\addtolength{\itemsep}{2mm}
+\item  induction on the length of an input word, or
+\item  building the corresponding product automata and checking 
+for isomorphism.
+\end{itemize}
+\vspace{2ex} 
+
+The second approach has one huge advantage: it is easily automated. 
+
+\end{frame}
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Simplify}
+
+So every map in $\cS$  can be written as 
+
+$$
+    f = \F{0}^{a} \: \F{1}^{b} \: \F{2}^{c}
+$$
+
+where $a, b, c \in \N$. 
+\vspace{5ex} 
+
+Even more concisely, we can write each of these maps as $(a,b,c) \in \N^{3}$.
+
+\end{frame}
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{It's a Group}
+
+But how about the inverses that are apparently missing from $\cS$?  
+\vspace{3ex} 
+
+We don't need to add them, they pop up automatically.
+\vspace{3ex}
+
+This can be seen from the unexpected identity 
+\vspace{1ex} 
+
+\begin{mathyellowbox}
+\F{0}^{2} \: \F{1}^{2} \: \F{2} = I
+\end{mathyellowbox}
+\vspace{3ex} 
+
+So for example  $\F{2}^{-1} = \F{0}^{2} \: \F{1}^{2}$. 
+
+\end{frame}
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Digression: Markov Chain}
+
+We can think of the transition matrix of $\cA$ as a stochastic matrix:
+
+\begin{columns}
+\begin{column}{0.4\textwidth}
+
+\includegraphics[scale=1.3]{invtrans-09-sta}
+
+\end{column}
+
+\begin{column}{0.4\textwidth}
+$$
+B = \left(
+\begin{array}{ccc}
+ 0 & 1 & 0 \\
+ 1/2  & 0 & 1 \\
+ 1/2 & 0 & 0 \\
+\end{array}
+\right)
+$$
+
+\end{column}
+\end{columns}
+\vspace{5ex} 
+
+This matrix $B$ has eigenvalue 1 with eigenvector  $(2,2,1)$ as in 
+$\F{0}^{2} \: \F{1}^{2} \: \F{2}^{1}$. 
+
+% \vspace{5ex} 
+
+% $B$ is not a manifestation of temporary insanity, it arises quite naturally when one
+% thinks of the group as a $\Q$-vector space $\Q \otimes G$.
+
+\end{frame}
+
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Pinning Down $\cS$}
+
+So $\cS$ is a commutative group, and there are only two generators:
+we can express $\F{2}$ in terms of $\F{0}$ and $\F{1}$.
+\vspace{5ex} 
+
+One might suspect that 
+\vspace{2ex}
+
+\begin{mathyellowbox}
+\cS \cong \Z^{2}
+\end{mathyellowbox}
+\vspace{2ex}
+
+but to show this we need to make sure there are no other identities lying around.
+
+\end{frame}
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Knuth to the Rescue}
+
+We need to rule out things like $\F{0}^{42} \F{1}^{17} = I$.
+\vspace{2ex}
+
+But how?  We can't just try out all possible identities. 
+\vspace{5ex} 
+
+Knuth came up with the following brilliant idea:
+\vspace{5ex} 
+
+\begin{graybox}
+\qquad Let's make the transducer infinite. 
+\end{graybox}
+
+\end{frame}
+
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Knuth's Infinite Machine}
+
+
+\begin{center}
+\includegraphics{invtrans-10-sta}
+\end{center}
+\vspace{5ex} 
+
+As it turns out, adding copy states $\F{3}$, $\F{4}$ \ldots does not 
+change $\cS$: we get no new permutations. 
+
+\end{frame}
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Why Bother?}
+
+Because now we have more identities:
+\vspace{5ex} 
+
+\begin{mathyellowbox}
+       \F{k}^{2} \: \F{k+1}^2 \: \F{k+2} = I
+\end{mathyellowbox}
+\vspace{3ex} 
+
+These hold for all $k \geq 0$. 
+
+
+\end{frame}
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{More Identities}
+
+
+\begin{mathyellowbox}
+       \F{k}^{2} = \F{k+2} \; \F{k+3}
+\end{mathyellowbox}
+\vspace{5ex} 
+
+
+This follows directly from the last slide.
+
+
+\end{frame}
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Knuth Normal Form}
+
+The new identities give us a rewrite system for any function in  $\cS$.
+\vspace{5ex} 
+
+\textbf{Theorem:}
+Every element $f$ of $\cS$ has a unique flat normal form 
+\begin{mathyellowbox}
+f = \F{k_{1}} \, \F{k_{2}} \, \ldots \F{k_{n}}
+\end{mathyellowbox}
+where $k_{1} < k_{2} < \ldots < k_{n}$. 
+
+\end{frame}
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{KNF for $\F{0}^{20}\F{1}^{20}$}
+
+
+$$
+\begin{tabular}{cccccccccccc}
+0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 \\
+\hline
+20 & 20  \\
+-20 & -20 & -10 &   \\
+    &     &  10 &  10 &  5  \\
+    &     &     & -10 & -10 &  -5  \\
+    &     &     &     &  6  &   6  &   3  \\
+    &     &     &     &     &      &  -2 & -2 & -1\\
+    &     &     &     &     &      &     &  2 &  2 & 1\\  
+\hline
+0 & 0 & 0 & 0 & 1 & 1 & 1 & 0 & 1 & 1
+\end{tabular}
+$$
+\vspace{3ex} 
+
+$$
+    \mathsf{KNF}(\F{0}^{20}\F{1}^{20}) = \F{4}\,\F{5}\,\F{6}\,\F{8}\,\F{9}
+$$
+
+\end{frame}
+
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Free Abelian}
+
+It follows from KNF that we already have all identities in $\cS$. 
+\vspace{5ex} 
+
+Hence we have
+\vspace{1ex}
+
+\begin{mathyellowbox}
+    \cS = \set{ \F{0}^{a} \: \F{1}^{b}}{ a, b \in \Z }  \cong \Z^{2}
+\end{mathyellowbox}
+\vspace{5ex} 
+
+And, there is a fractal. 
+
+\end{frame}
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{KNF for $\F{0}^{k}$}
+
+\hspace*{2mm}
+\includegraphics[scale=0.8]{KNF-64}
+\vspace{8ex} 
+
+
+KNF of $\F{0}^{k}$, $0 \leq k < 64$
+
+column height: number of terms
+
+colors: represent numerical value
+
+\end{frame}
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{}
+
+\hspace*{-15mm}
+\includegraphics[scale=0.25]{KNF-1024}
+
+
+\end{frame}
+
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{}
+
+\begin{center}
+ \includegraphics[scale=0.65]{knf-length-512-avocado}
+\end{center}
+
+\end{frame}
+
+
+% %---------------------------------------------------------------------------
+% \begin{frame}
+% \frametitle{Gaussian Integers}
+
+% The theorem implies that $\cS \cong \Z \times \Z$. 
+% \vspace{3ex}
+
+% A nice way of describing an isomorphism is to 
+% translate Knuth normal form into a Gaussian integer:
+% Let  $\rho = i - 1 \in \C$ and define
+% \vspace{2ex} 
+
+% \begin{mathyellowbox}
+% \varphi(f) = \rho^{k_{1}} \: \rho^{k_{2}} \ldots \rho^{k_{t}}
+% \end{mathyellowbox}
+% \vspace{2ex} 
+
+% where $f = \F{k_{1}} \: \F{k_{2}} \ldots \F{k_{n}}$ is the flat normal form.
+% \vspace{5ex} 
+
+% This is a group isomorphism from $\cS$ to $\Z[i]$. 
+
+
+% \end{frame}
+
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{And Equivalence Testing?}
+
+The description of $\cS$ as $\Z^2$ makes it much easier to understand 
+its structure:
+with a bit of effort, everything can be expressed in terms of linear algebra. 
+\vspace{2ex} 
+
+There is no need to deal with complicated machines like 
+
+\begin{center}
+\includegraphics[scale=0.5]{A-3-2-principal}
+\end{center}
+\vspace{1ex} 
+
+Even better: we have lots of algorithms at our disposal. 
+In particular one can check whether $x$ and $y$ are on the same orbit in polynomial time. 
+
+\end{frame}
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{The Whopper}
+
+\begin{theorem}
+There is a finite state machine that can check if $x$ and $y$ lie on 
+the same orbit under $\F{0}$. 
+\end{theorem}
+\vspace{10ex} 
+
+Truth in advertising: I spent a lot of time trying to disprove this. 
+
+
+\end{frame}
+
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{The Orbit Checker}
+\vspace{-2ex}
+
+\begin{center}
+\includegraphics[scale=0.28]{M0-3820}
+\end{center}
+\vspace{-2ex}
+
+This machine is minimal and has 34 states.  Don't ask why.  
+
+\end{frame}
+
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{And Timestamps?}
+
+With a little more effort one can show that timestamps can also be computed
+by a finite state machine:
+\vspace{5ex}
+
+There is a transducer that takes $x{:}y$ as input, and returns the least
+timestamp $t$ as output, if it exists (otherwise the machine returns no output).
+\vspace{5ex}
+
+Similarly there is a transducer that takes as input $x$ and returns as output
+the lexicographically least element of the orbit of $x$. 
+
+\end{frame}
+
+
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{The Message}
+
+Combining classic machinery from math with computation produces lots 
+of interesting results. 
+\vspace{5ex} 
+
+It is hard to imagine that these results could be obtained solely with
+traditional methods.
+\vspace{5ex}
+
+
+\begin{graybox}
+\qquad  Computation provides a new lense on reality. 
+\end{graybox}
+
+\end{frame}
+
+%---------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Computational Discrete Math}
+
+Classical topics in math and theory are often quite inaccessible, 
+it may take years to get to the point where new contributions are possible. 
+\vspace{2ex} 
+
+By throwing computation into the mix, the landscape shifts. 
+\vspace{5ex} 
+
+\begin{description}[style=nextline]
+\addtolength{\itemsep}{2mm}
+\item[Kevin Lewi]   Stanford CS
+\item[Tsutomo Okano]  UIUC math
+\item[Tim Becker]  Chicago math
+\end{description}
+
+\end{frame}
+
+
+% %---------------------------------------------------------------------------
+% \section{Equivalence Testing}
+% \frame{\tableofcontents[current]}
+% %---------------------------------------------------------------------------
+
+
+% %---------------------------------------------------------------------------
+% \begin{frame}
+% \frametitle{Iteration and Timestamps}
+
+
+% \textbf{Warm Up:} How would we compute $\F{0}^{1,000,000}(x)$ intelligently? 
+% \vspace{5ex} 
+
+
+% Recall the Central Axiom of CS: 
+% \vspace{5ex} 
+
+% \begin{graybox}
+% Do not compute anything unless you absolutely have to. 
+% \end{graybox}
+
+% \end{frame}
+
+% %---------------------------------------------------------------------------
+% \begin{frame}
+% \frametitle{But How?}
+
+% We would like to treat $\F{0}^{1,000,000}$ much like $\F{0}$: 
+% application is just diagram chasing. 
+% \vspace{3ex} 
+
+% For $\F{0}^{1,000,000}$ it is a bit messy to produce the right diagram, 
+% but for $\F{0}^{8}$ we can do it:
+
+
+% \begin{center}
+% \includegraphics{CCC-3-2-0-8}
+% \end{center}
+
+
+% \end{frame}
+
+% %---------------------------------------------------------------------------
+% \begin{frame}
+% \frametitle{Residuals}
+
+% If we don't have the diagram for $\F{0}^t$ in hand, how can we still 
+% do diagram chasing? 
+% \vspace{2ex} 
+
+% Let's define the \alert{residual} of $f \in \cS$:
+% \vspace{2ex} 
+
+% \begin{mathyellowbox}
+% f(ax) = b \, \resid{a}{f}(x)
+% \end{mathyellowbox}
+% \vspace{5ex} 
+
+% $\resid{a}{f}$ is the next state in the diagram reading input $a$.
+% \vspace{1ex} 
+
+% Residuation looks a little bit like differentiation. 
+% \vspace{1ex} 
+
+% It is easy to see that $\resid{a}{f}$  still belongs to $\cS$, 
+% so our sandbox still holds up.  
+
+% \end{frame}
+
+
+% %---------------------------------------------------------------------------
+% \begin{frame}
+% \frametitle{Computing $b$}
+
+
+% Call $f \in \cS$ \alert{even} if $f(a)=a$, \alert{odd} otherwise. 
+% \vspace{2ex} 
+
+% E.g., $\F{1}$ and $\F{0}^{2}$ are even, $\F{0}$ and $\F{0}^{3}$ are odd. 
+% \vspace{2ex} 
+
+
+% So the bit $b$ in 
+
+% $$
+%   f(ax) = b \, \resid{a}{f}(x)
+% $$
+
+% just depends on $a$ and $f$ being even or odd. 
+% \vspace{2ex} 
+
+% If we write $f$ as a vector $\begin{klein}x\\y \end{klein} \in \Z^{2}$  
+% then $f$ is odd iff $x$ is odd. 
+
+% \end{frame}
+
+% %---------------------------------------------------------------------------
+% \begin{frame}
+% \frametitle{Computing Residuals is Easy}
+
+% But how about $\resid{a}{\begin{klein}u\\v \end{klein}}$?  
+
+
+% Let 
+% %
+% $$
+% A = 
+% \begin{pmatrix*}
+%  -1  & 1  \\
+% -1/2 & 0
+% \end{pmatrix*}
+% \qquad\qquad
+% r = 
+% \begin{pmatrix*}
+%  -1   \\
+%  -3/2
+% \end{pmatrix*}
+% $$
+% %
+% \vspace{3ex} 
+
+% Then 
+% $$
+% \resid{a}{\begin{klein}u\\v \end{klein}}  = %  
+% \begin{cases}
+% A \cdot \begin{klein}u\\v \end{klein}  & \text{if $u$ even,}    \\
+% A \cdot \begin{klein}u\\v \end{klein} + (-1)^{a} r &  \text{otherwise.}
+% \end{cases}
+% $$
+% \vspace{5ex} 
+
+% For example,  $\resid{1}{\begin{klein}200\\-50 \end{klein}} = (-150,-100)$
+% \end{frame}
+
+
+% %---------------------------------------------------------------------------
+% \begin{frame}
+% \frametitle{A Full Transduction}
+
+% Now we can compute $f(x)$ for any $f \in \cS$ in just one scan:
+
+% Example $\F{0}^{21}(000000000)$:
+
+% $$
+% \begin{array}{rrcr}
+%  21  & 0   &\to& 1   \\
+%  -22 & -12 &\to& 0  \\
+%  10  & 11  &\to& 0   \\
+%  1   & -5  &\to& 1    \\
+%  -7  & -2  &\to& 1   \\
+%  4   & 2   &\to& 0    \\
+%  -2  & -2  &\to& 0   \\
+%  0   & 1   &\to& 0    \\
+%  1   & 0   &\to& 1    \\
+%  -2  & -2  &\to& 0   \\
+% \end{array}
+% $$
+
+% \end{frame}
+
+
+% %---------------------------------------------------------------------------
+% \begin{frame}
+% \frametitle{Computing $f(x)$}
+
+% \begin{tabbing}
+% mmm \= mmm \= mmm \= mmm \= mmm \kill \+ \\[1ex]
+
+% $h = f$;  \\[1ex]
+% \textbf{for} $i = 0,\ldots,n-1$ \textbf{do}  \+ \\[1ex]
+%    $y_{i} = h_{1} + x_{i}  \bmod{2}$; \hspace*{10mm}  // next output bit \\[1ex]
+%    $h = \resid{x_{i}}h$;  \- \\[1ex]
+% \textbf{return}  $y$;
+% \end{tabbing}
+% \vspace{3ex} 
+
+% Pseudo-code for the algorithm computing $f(x_{0}x_{1}\ldots x_{n-1})$. 
+
+% \end{frame}
+
+% %---------------------------------------------------------------------------
+% \begin{frame}
+% \frametitle{OK, But How About Equivalence Testing?}
+
+
+% It is easy to compute $f^{t}(x)$ given $t$, but we want to know whether
+
+% \begin{mathyellowbox}
+%    \fex{t}\left( f^t(x) = y \right)
+% \end{mathyellowbox}
+
+
+% So we have bitstrings $x = x_{0}x_{1}\ldots x_{n-1}$ and 
+% $y = y_{0}y_{1}\ldots y_{n-1}$.
+% \vspace{3ex} 
+
+% We would like compute the proper time stamp $t$, or 
+% determine that it does not exist. 
+% \vspace{3ex} 
+
+% For simplicity consider only $f = \F{0}$ and 
+% write the timestamp as $t = t_{0}t_{1}\ldots t_{n-1}$ in reverse binary. 
+% \vspace{3ex} 
+
+% Note that $t_0$ is easy to find:  $t_{0} = x_{0} + y_{0} \bmod{2}$. 
+
+% \end{frame}
+
+
+
+
+% %---------------------------------------------------------------------------
+% \begin{frame}
+% \frametitle{Shuffle}
+
+% For the other bits of $t$ we need a little observation. 
+% \vspace{2ex} 
+
+% Suppose $a =a_{0} a_{1} \ldots a_{n-1}$ and $b = b_{0} b_{1} \ldots b_{n-1}$ 
+% are two words of length $n$. 
+% \vspace{2ex} 
+
+% Recall that the \alert{perfect shuffle} $a \shuffle b$ of $a$ and $b$ is 
+% defined by interleaving the letters of $a$  and $b$:
+% \vspace{3ex} 
+
+% \begin{mathyellowbox} 
+%   a \shuffle b = a_{0} b_{0} a_{1} b_{1} a_{2} b_{2} \ldots a_{n-1} b_{n1}
+% \end{mathyellowbox}
+% \vspace{5ex} 
+
+
+% Of course, our transducer knows nothing about shuffle.
+
+
+% \end{frame}
+
+
+% %---------------------------------------------------------------------------
+% \begin{frame}
+% \frametitle{A Pattern}
+
+
+% Fix some arbitrary word $u$ of length $2n$.  
+% \vspace{5ex} 
+
+% \begin{claim}
+% For every word $a =a_{0} a_{1} \ldots a_{n-1}$ there is a unique word 
+% $b = b_{0} b_{1} \ldots b_{n-1}$ such that $a \shuffle b$ 
+% lies on the orbit of $u$.
+% \end{claim}
+% \vspace{5ex}
+
+% So on any orbit, half the bits of a word determine the other half:
+% the  $a$-bits determine the $b$-bits. 
+% \vspace{2ex} 
+
+% That explains the length of the orbit. 
+
+% \end{frame}
+
+
+
+
+% %---------------------------------------------------------------------------
+% \begin{frame}
+% \frametitle{Quoi?}
+
+% Suppose we have words of length $2n$, 
+% and consider the orbit determined by $x$. 
+
+% If the target word $y$ lies on the orbit we can write it as 
+% a shuffle product
+% $$
+%   y = a_{0} b_{0} a_{1} b_{1} \ldots a_{n-1} b_{n-1}  \in \2^{2n}
+% $$
+% \vspace{3ex} 
+
+% Since the orbit has length $2^n$ there is exactly one value of 
+% $t$ for each of the $a$-vectors:  the timestamp 
+% $t$ determines the $a$-bits and the $a$-bits in turn determine the 
+% $b$-bits. 
+
+% \end{frame}
+
+
+% %---------------------------------------------------------------------------
+% \begin{frame}
+% \frametitle{An Idea} 
+
+% \vspace{2ex} 
+
+% We could use $t_i$ to hit $a_i$ and then check if $b_i$ also works out. 
+% \vspace{2ex} 
+
+% If all the checks succeed we have found a timestamp, if one of them 
+% fails we stop and return \textsf{NO}.
+% \vspace{3ex} 
+
+% This makes sense at least for $i=0$: we choose $t_0 = 0/1$ depending on 
+% whether  $x_{0} = a_{0}$.
+
+% Of course we need $x_{1} = b_{0}$.
+
+% \end{frame}
+
+% %---------------------------------------------------------------------------
+% \begin{frame}
+% \frametitle{An Equivalence Testing Algorithm}
+
+% \begin{tabbing}
+% mmm \= mmm \= mmm \= mmm \= mmm \kill
+% // equivalence testing algorithm \+ \\
+% $h = (0,0)$;  \\
+% \textbf{for} $r = 0,\ldots,n-1$ \textbf{do}  \+ \\
+%    $t_{r} = h_{1} + x_{2r} + y_{2r} \bmod{2}$; \hspace*{16mm}  // phase 1: bind $t_{r}$  \\ 
+%    $h = \resid{x_{2r}}( h + t_{r} \cdot \Gamma_{d} )$;  \\
+%    \textbf{if} $h_{1} + x_{2r+1} + y_{2r+1} = 0 \bmod{2}$ \hspace*{10mm} // phase 2: check\\
+%    \textbf{then} $h = \resid{x_{2r+1}}( h )$; \\
+%    \textbf{else} \textbf{return}  No;  \- \\
+% \textbf{return}  $t$;
+% \end{tabbing}
+% \vspace{3ex} 
+
+% This is an optimized version, ignore the $\Gamma_{d}$. 
+
+% \end{frame}
+
+
+% %---------------------------------------------------------------------------
+% \begin{frame}
+% \frametitle{Example}
+
+% $x = 101110010010$, $y = 001000011000$.  
+% In this case $y = \F{0}^{43}(x)$.  
+
+
+% $$
+% \small{\begin{array}{cllll}
+%  r \hspace*{2mm} & t_{i}\qquad\quad  &  h_{1} &  h_{2}  \\
+% \hline
+%    &   & t_0+2 t_1+4 t_2+8 t_3+16 t_4+32 t_5 & 0 \\
+%  0 & t_0=1 & -2 t_1-4 t_2-8 t_3-16 t_4-32 t_5 & 1-t_1-2 t_2-4 t_3-8 t_4-16 t_5 \\
+%    &   & 1+t_1+2 t_2+4 t_3+8 t_4+16 t_5 & t_1+2 t_2+4 t_3+8 t_4+16 t_5 \\
+%  1 & t_1=1 & -1 & -1-t_2-2 t_3-4 t_4-8 t_5 \\
+%    &   & 1-t_2-2 t_3-4 t_4-8 t_5 & 2 \\
+%  2 & t_2=0 & 2+2 t_3+4 t_4+8 t_5 & 1+t_3+2 t_4+4 t_5 \\
+%    &   & -1-t_3-2 t_4-4 t_5 & -1-t_3-2 t_4-4 t_5 \\
+%  3 & t_3=1 & 0 & 1+t_4+2 t_5 \\
+%    &   & 1+t_4+2 t_5 & 0 \\
+%  4 & t_4=0 & -2-2 t_5 & -2-t_5 \\
+%    &   & t_5 & 1+t_5 \\
+%  5 & t_5=1 & 2 & 1 \\
+%    &   & -1 & -1 \\
+% \end{array}}
+% $$
+
+
+% \end{frame}
+
+% %---------------------------------------------------------------------------
+% \begin{frame}
+% \frametitle{Equivalence is Rational}
+
+
+% The running time of the algorithm is easily cubic in $n$. 
+% \vspace{2ex} 
+
+% But with a lot of effort we can actually get it down to linear in $n$:
+% there is only a constant amount of work at each round. 
+% \vspace{5ex} 
+
+% \begin{theorem}
+% There is a finite state machine that can check if $x$ and $y$ lie on the same orbit.
+% \end{theorem}
+
+% \end{frame}
+
+
+% %---------------------------------------------------------------------------
+% \begin{frame}
+% \frametitle{The Equivalence Automaton}
+% \vspace{-2ex}
+
+% \begin{center}
+% \includegraphics[scale=0.28]{M0-3820}
+% \end{center}
+% \vspace{-2ex}
+
+% A whopping 34 states (this machine is minimal). 
+
+% \end{frame}
+
+
+
+% %---------------------------------------------------------------------------
+% \begin{frame}
+% \frametitle{Generalization}
+
+% \begin{center}
+% \includegraphics{invtrans-03-sta}
+% \end{center}
+% \vspace{1ex} 
+
+% There are many ways to generalize our little game. 
+% Little is known about these generalizations. 
+
+
+% \end{frame}
+
+
+%---------------------------------------------------------------------------
+\end{document}
+
+% Local Variables:
+% TeX-PDF-mode: t
+% End:
+
+
+%  LocalWords:  pausesections GoL 0x 1x KNF RHS mmm
